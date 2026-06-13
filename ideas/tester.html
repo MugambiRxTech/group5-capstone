@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html class="light" lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>Atmosphere - Weather-Smart Planning</title>
+    
+    <!-- Scripts & Libraries -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/history@5/umd/history.development.js"></script>
+    <script src="https://unpkg.com/react-router@6.3.0/umd/react-router.development.js"></script>
+    <script src="https://unpkg.com/react-router-dom@6.3.0/umd/react-router-dom.development.js"></script>
+    <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+
+    <!-- Fonts & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#0058bc",
+                        "on-primary": "#ffffff",
+                        "primary-container": "#0070eb",
+                        "on-primary-container": "#fefcff",
+                        "secondary": "#8c5000",
+                        "on-secondary": "#ffffff",
+                        "secondary-container": "#fe9400",
+                        "tertiary": "#4c4aca",
+                        "on-tertiary": "#ffffff",
+                        "tertiary-container": "#6664e4",
+                        "background": "#faf9fe",
+                        "on-background": "#1a1b1f",
+                        "surface": "#faf9fe",
+                        "on-surface": "#1a1b1f",
+                        "surface-variant": "#e3e2e7",
+                        "on-surface-variant": "#414755",
+                        "outline": "#717786",
+                        "outline-variant": "#c1c6d7",
+                        "surface-container": "#eeedf3",
+                        "surface-container-low": "#f4f3f8",
+                        "surface-container-high": "#e9e7ed",
+                        "surface-container-highest": "#e3e2e7",
+                        "surface-container-lowest": "#ffffff",
+                        "error": "#ba1a1a",
+                        "on-error": "#ffffff",
+                        "error-container": "#ffdad6",
+                        "on-error-container": "#93000a",
+                        "primary-fixed": "#d8e2ff",
+                        "primary-fixed-dim": "#adc6ff",
+                        "on-primary-fixed": "#001a41",
+                        "on-primary-fixed-variant": "#004493",
+                        "secondary-fixed": "#ffdcbf",
+                        "secondary-fixed-dim": "#ffb874",
+                        "on-secondary-fixed": "#2d1600",
+                        "on-secondary-fixed-variant": "#6a3b00",
+                        "tertiary-fixed": "#e2dfff",
+                        "tertiary-fixed-dim": "#c2c1ff",
+                        "on-tertiary-fixed": "#0c006a",
+                        "on-tertiary-fixed-variant": "#3631b4",
+                        "inverse-surface": "#2f3034",
+                        "inverse-on-surface": "#f1f0f5",
+                        "inverse-primary": "#adc6ff"
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    spacing: {
+                        "unit": "8px",
+                        "gutter": "16px",
+                        "section-gap": "32px",
+                        "container-margin-mobile": "16px",
+                        "container-margin-desktop": "40px"
+                    },
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                        "label-md": ["Plus Jakarta Sans"],
+                        "headline-md": ["Plus Jakarta Sans"],
+                        "headline-lg": ["Plus Jakarta Sans"],
+                        "display-lg": ["Plus Jakarta Sans"]
+                    },
+                    fontSize: {
+                        "label-sm": ["12px", { "lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "500" }],
+                        "label-md": ["14px", { "lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "700" }],
+                        "display-lg": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700" }]
+                    }
+                },
+            },
+        }
+    </script>
+
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            scroll-behavior: smooth;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        .glass {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.8);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+            border: 1px solid rgba(229, 229, 234, 0.5);
+        }
+        .card-hover {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .card-hover:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 24px -8px rgba(0, 0, 0, 0.08);
+        }
+        .scroll-hide::-webkit-scrollbar { display: none; }
+        .scroll-hide { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="bg-background text-on-surface">
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+        const { createRoot } = ReactDOM;
+        const { MemoryRouter, Routes, Route, Link, useNavigate, useLocation } = ReactRouterDOM;
+
+        // --- Common Components ---
+
+        const NavBar = () => {
+            const location = useLocation();
+            const activeClass = "text-primary border-b-2 border-primary pb-1 font-bold";
+            const inactiveClass = "text-on-surface-variant hover:text-primary transition-colors";
+
+            return (
+                <nav className="fixed top-0 w-full z-50 bg-surface/80 dark:bg-surface-dim/80 backdrop-blur-xl shadow-sm">
+                    <div className="max-w-[1200px] mx-auto flex justify-between items-center px-gutter md:px-container-margin-desktop py-4">
+                        <Link to="/" className="flex items-center gap-2">
+                            <span className="text-headline-md font-bold text-primary dark:text-primary-fixed-dim">Atmosphere</span>
+                        </Link>
+                        <div className="hidden md:flex items-center gap-8">
+                            <Link to="/" className={`font-label-md ${location.pathname === '/' ? activeClass : inactiveClass}`}>Home</Link>
+                            <Link to="/bookmarks" className={`font-label-md ${location.pathname === '/bookmarks' ? activeClass : inactiveClass}`}>Bookmarks</Link>
+                            <Link to="/login" className={`font-label-md ${location.pathname === '/login' ? activeClass : inactiveClass}`}>Log In</Link>
+                        </div>
+                        <div className="flex items-center gap-4">
+                            <button className="material-symbols-outlined p-2 hover:bg-primary-container/10 rounded-full transition-all text-on-surface-variant">search</button>
+                        </div>
+                    </div>
+                </nav>
+            );
+        };
+
+        const Footer = () => (
+            <footer className="w-full pt-section-gap pb-8 bg-surface-container-lowest dark:bg-inverse-surface border-t border-outline-variant dark:border-outline">
+                <div className="max-w-[1200px] mx-auto px-container-margin-desktop grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-gutter">
+                    <div className="space-y-4">
+                        <span className="text-headline-md font-bold text-on-surface dark:text-inverse-on-surface">Atmosphere</span>
+                        <p className="font-body-md text-on-surface-variant dark:text-outline-variant">
+                            Precision weather forecasting for your life's most important moments.
+                        </p>
+                    </div>
+                    <div>
+                        <h4 className="font-label-md text-primary dark:text-primary-fixed-dim mb-4">Resources</h4>
+                        <ul className="space-y-2">
+                            <li><a className="font-body-md text-on-surface-variant dark:text-outline-variant hover:text-primary hover:underline" href="#">Privacy Policy</a></li>
+                            <li><a className="font-body-md text-on-surface-variant dark:text-outline-variant hover:text-primary hover:underline" href="#">Terms of Service</a></li>
+                            <li><a className="font-body-md text-on-surface-variant dark:text-outline-variant hover:text-primary hover:underline" href="#">Weather Data API</a></li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4 className="font-label-md text-primary dark:text-primary-fixed-dim mb-4">Support</h4>
+                        <ul className="space-y-2">
+                            <li><a className="font-body-md text-on-surface-variant dark:text-outline-variant hover:text-primary hover:underline" href="#">Help Center</a></li>
+                            <li><a className="font-body-md text-on-surface-variant dark:text-outline-variant hover:text-primary hover:underline" href="#">Contact Us</a></li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4 className="font-label-md text-primary dark:text-primary-fixed-dim mb-4">Newsletter</h4>
+                        <div className="flex gap-2">
+                            <input className="bg-surface-container border-none rounded-lg px-4 py-2 text-body-md w-full focus:ring-2 focus:ring-primary" placeholder="Email address" type="email" />
+                            <button className="bg-primary text-on-primary p-2 rounded-lg material-symbols-outlined">send</button>
+                        </div>
+                    </div>
+                </div>
+                <div className="max-w-[1200px] mx-auto px-container-margin-desktop mt-section-gap pt-8 border-t border-outline-variant">
+                    <p className="font-body-md text-on-surface-variant text-center">
+                        © 2024 Atmosphere Weather-Smart Planning. All rights reserved.
+                    </p>
+                </div>
+            </footer>
+        );
+
+        // --- Page Components ---
+
+        const BookmarksPage = () => {
+            const navigate = useNavigate();
+            
+            return (
+                <div className="min-h-screen">
+                    <NavBar />
+                    <main className="pt-[100px] pb-section-gap max-w-[1200px] mx-auto px-gutter md:px-container-margin-desktop">
+                        <header className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-section-gap">
+                            <div>
+                                <h1 className="font-headline-lg text-on-surface mb-2">My Bookmarks</h1>
+                                <p className="font-body-md text-on-surface-variant">Your weather-smart planned destinations and events.</p>
+                            </div>
+                            <button className="flex items-center gap-2 bg-primary-container text-on-primary-container px-6 py-3 rounded-xl font-label-md hover:opacity-90 transition-all shadow-sm">
+                                <span className="material-symbols-outlined">add_location_alt</span>
+                                Add New Bookmark
+                            </button>
+                        </header>
+                        
+                        <div className="flex flex-col lg:flex-row gap-gutter">
+                            <div className="flex-1">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-gutter">
+                                    {/* Bookmark Card 1 */}
+                                    <div onClick={() => navigate('/event')} className="card-hover cursor-pointer bg-surface-container-lowest border border-outline-variant rounded-xl overflow-hidden group">
+                                        <div className="relative h-40">
+                                            <img alt="Maui Beach" className="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDza-6AtnJGdbZOk1Wd6lQkJaV1FonujbO9K5MnKx9-o_IE34RncFIRllldkyWrNIl13JhuWc0GmzMSfmkvdctxX_UOp2AL8OiIJ55oTmKEUpq9GVQvoVmv7x8IxXQ0--60_yu_FdFHIOdC0BHXH0kPnN9Lx6B_gwN4MuvC_Rvz-_IRZPuLI8ObwMlQCQOYFOr13nSZuR_334OAjs1COaKOzAgfla3-gud-cXCNw6Oes8rhoLCFi4hGmH_onP52v8M7wdOSWkXQ3KZU" />
+                                            <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-md px-3 py-1 rounded-full flex items-center gap-1 shadow-sm">
+                                                <span className="material-symbols-outlined text-secondary text-[18px] fill-current">sunny</span>
+                                                <span className="font-label-sm text-on-surface">28°C</span>
+                                            </div>
+                                        </div>
+                                        <div className="p-5">
+                                            <div className="flex justify-between items-start mb-2">
+                                                <div>
+                                                    <h3 className="font-headline-md text-on-surface">Maui, HI</h3>
+                                                    <p className="font-label-md text-primary">Surfing Trip</p>
+                                                </div>
+                                                <button className="material-symbols-outlined text-outline hover:text-error transition-colors" onClick={(e) => e.stopPropagation()}>favorite</button>
+                                            </div>
+                                            <div className="flex items-center gap-4 mt-4 py-3 border-t border-outline-variant">
+                                                <div className="flex items-center gap-1 text-on-surface-variant">
+                                                    <span className="material-symbols-outlined text-[20px]">water_drop</span>
+                                                    <span className="font-label-sm">12%</span>
+                                                </div>
+                                                <div className="flex items-center gap-1 text-on-surface-variant">
+                                                    <span className="material-symbols-outlined text-[20px]">air</span>
+                                                    <span className="font-label-sm">14km/h</span>
+                                                </div>
+                                                <div className="ml-auto bg-tertiary-fixed text-on-tertiary-fixed-variant px-3 py-1 rounded-full font-label-sm">
+                                                    Ideal Conditions
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* Bookmark Card 2 */}
+                                    <div onClick={() => navigate('/event')} className="card-hover cursor-pointer bg-surface-container-lowest border border-outline-variant rounded-xl overflow-hidden group">
+                                        <div className="relative h-40">
+                                            <img alt="Aspen" className="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCz1Jc15Q8jHzroSbOdB0clYyZ-NxGUv-WKTIrs_vgIJwaGeMn74gwoNFJA3aDIylmlx8ZVROrbltzHho4wpQVccWm1jfwHhS9QkvMlctpUtIQMixT91JEfGHDCX9jTsCtKZ69mIo7mVu515Kpfy_JL4ekij6eBDngdLG4LtU2225hq5Tdu60S50Hlin8E8elAMaRMFus8G3rkGUdPbPuXB-1Y8fH3vsWAs2FmBwwE04LgY8LTSjf7Gx4BmPb6X-fvY4eHdYRG3sSE5" />
+                                            <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-md px-3 py-1 rounded-full flex items-center gap-1 shadow-sm">
+                                                <span className="material-symbols-outlined text-primary text-[18px] fill-current">ac_unit</span>
+                                                <span className="font-label-sm text-on-surface">-4°C</span>
+                                            </div>
+                                        </div>
+                                        <div className="p-5">
+                                            <div className="flex justify-between items-start mb-2">
+                                                <div>
+                                                    <h3 className="font-headline-md text-on-surface">Aspen, CO</h3>
+                                                    <p className="font-label-md text-primary">Ski Weekend</p>
+                                                </div>
+                                                <button className="material-symbols-outlined text-outline hover:text-error transition-colors" onClick={(e) => e.stopPropagation()}>favorite</button>
+                                            </div>
+                                            <div className="flex items-center gap-4 mt-4 py-3 border-t border-outline-variant">
+                                                <div className="flex items-center gap-1 text-on-surface-variant">
+                                                    <span className="material-symbols-outlined text-[20px]">cloud</span>
+                                                    <span className="font-label-sm">Partly Cloudy</span>
+                                                </div>
+                                                <div className="ml-auto bg-secondary-fixed text-on-secondary-fixed-variant px-3 py-1 rounded-full font-label-sm">
+                                                    High UV
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* Bookmark Card 3 */}
+                                    <div onClick={() => navigate('/event')} className="card-hover cursor-pointer bg-surface-container-lowest border border-outline-variant rounded-xl overflow-hidden group">
+                                        <div className="relative h-40">
+                                            <img alt="London" className="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCTjxAogel70QzjZ_QwooGQg0H_dZ-5UM_QPU2YbDHU-DCBqEhufqUxfVJCcpRzMW4giA0n0pJI5FUna8TUVYRPnCSR9WrYRYx6QuzVWs2ZYKx3ldnn8Ea-gB1PgkLbdJnNGsj9Yjpng0h3v5aQvlB0sABCiBNYcONKwATfzSeswZi43bGHSAirMv2xUFvPIpyHhs2P9wXkrkiVCDSdZPopTUCrBlbbmF3E2IRwLqgI_gCBPV2vs2w26pP_6VL6pulOWfHvOkpoLUza" />
+                                            <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-md px-3 py-1 rounded-full flex items-center gap-1 shadow-sm">
+                                                <span className="material-symbols-outlined text-outline text-[18px] fill-current">cloud</span>
+                                                <span className="font-label-sm text-on-surface">14°C</span>
+                                            </div>
+                                        </div>
+                                        <div className="p-5">
+                                            <div className="flex justify-between items-start mb-2">
+                                                <div>
+                                                    <h3 className="font-headline-md text-on-surface">London, UK</h3>
+                                                    <p className="font-label-md text-primary">Business Summit</p>
+                                                </div>
+                                                <button className="material-symbols-outlined text-outline hover:text-error transition-colors" onClick={(e) => e.stopPropagation()}>favorite</button>
+                                            </div>
+                                            <div className="flex items-center gap-4 mt-4 py-3 border-t border-outline-variant">
+                                                <div className="flex items-center gap-1 text-on-surface-variant">
+                                                    <span className="material-symbols-outlined text-[20px]">umbrella</span>
+                                                    <span className="font-label-sm">80% Rain</span>
+                                                </div>
+                                                <div className="ml-auto bg-error-container text-on-error-container px-3 py-1 rounded-full font-label-sm">
+                                                    Bring Umbrella
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* Add Card Placeholder */}
+                                    <button className="flex flex-col items-center justify-center gap-4 border-2 border-dashed border-outline-variant rounded-xl p-8 hover:border-primary hover:bg-primary-container/5 transition-all group">
+                                        <div className="w-12 h-12 rounded-full bg-surface-container-high flex items-center justify-center group-hover:bg-primary-container transition-all">
+                                            <span className="material-symbols-outlined text-primary group-hover:text-white">add</span>
+                                        </div>
+                                        <span className="font-label-md text-on-surface-variant group-hover:text-primary">Add New BookMark</span>
+                                    </button>
+                                </div>
+                            </div>
+
+                            {/* Sidebar */}
+                            <aside className="w-full lg:w-[320px] space-y-gutter">
+                                <div className="bg-surface-container-lowest border border-outline-variant rounded-xl p-6">
+                                    <h2 className="font-label-md text-on-surface-variant mb-4 uppercase tracking-wider">Recently Viewed</h2>
+                                    <div className="space-y-4">
+                                        {[
+                                            { name: "Paris, FR", condition: "Mostly Sunny • 19°C", img: "https://lh3.googleusercontent.com/aida-public/AB6AXuArjQmmqXvrIyBVNG_OOuNxcH4ZgFuqm_o-wL_kkIb2_ubG3aWaetJ_cKvf2WRKdBGRsqSK51aMhn9dXGK_cehroTDzMmSkDjUkWtRy1KBRc1RRFN3eIrWb7vrXjNUhMCIwRq4K-ThgNBN-Rt4eakXXUTFWWEmxl7cP6fV4bC7Z4n2l-EYeV7n4qsaUXa0qzjVsHBxjGex45vxU9TzBJC5AxWs--xL3TkozgN83j5-wLEp2xde5zNXZyiunGlBFqXOv1N6o3wPUESDi" },
+                                            { name: "New York, NY", condition: "Light Rain • 16°C", img: "https://lh3.googleusercontent.com/aida-public/AB6AXuCuwvWxYMWQCjSlHc_DOOk_L3XjtmubjymPBFVryexQ4dbKKs5Kkd6P81b5UAa_Xnd8KOm2YiJS60vP0hP4ftip-Ins_1lg04B7ZHaMC-vJ9l_tKW0MvODBGEsQunzSDjVhmPkC5Ov2q1vpOUFJ4GO9CIDt2zqzHPZKlJLaW0mFnAmEG3n0Zfeo73dVCGylJbV4ktWveNCpxQUaUvdpIv1aHjrmaTzGwoG6qUz64ztRwZiLK6HZKx1hVVYUXiNKSg0UU5uo4nahRjpF" },
+                                            { name: "Yosemite, CA", condition: "Clear Sky • 22°C", img: "https://lh3.googleusercontent.com/aida-public/AB6AXuDGEZPLjoZQSOG_nmO5TryAco5zjXc7yC_lzugzf5v-yMdrx1NqROSZ2i_PNLTT6U0qb4Cg4nzBSSNPWTE0qziV9oNwTRkedalYL_Ulosu1ysZTaRBDmSB0DeK8M4QL79HckASvCQ74-PX7GzJ0eHtdMBPdXUbd5DrU5VU2xMU2XZQn_FAnr8AetlHWVyVPRZRIz9Azq_ukTio7BU_sLQLi4iLB54MvoTjMG1vb8mjuVA1sYevdweEM7a156-PONaxiE51bZDCOOyVy" }
+                                        ].map((item, idx) => (
+                                            <Link key={idx} to="/event" className="flex items-center gap-3 p-3 rounded-lg hover:bg-surface-container transition-all group">
+                                                <div className="w-10 h-10 rounded-lg overflow-hidden bg-surface-container-high flex-shrink-0">
+                                                    <img src={item.img} className="w-full h-full object-cover" />
+                                                </div>
+                                                <div className="flex-1 min-w-0">
+                                                    <h4 className="font-label-md text-on-surface truncate">{item.name}</h4>
+                                                    <p className="font-label-sm text-on-surface-variant truncate">{item.condition}</p>
+                                                </div>
+                                                <span className="material-symbols-outlined text-outline-variant group-hover:text-primary text-[20px]">chevron_right</span>
+                                            </Link>
+                                        ))}
+                                    </div>
+                                    <button className="w-full mt-6 py-2 border border-outline-variant rounded-full font-label-sm text-on-surface-variant hover:border-primary hover:text-primary transition-all">
+                                        View Browsing History
+                                    </button>
+                                </div>
+                                <div className="bg-secondary-container/10 border border-secondary-container/20 rounded-xl p-6">
+                                    <div className="flex items-center gap-2 text-secondary mb-2">
+                                        <span className="material-symbols-outlined fill-current">warning</span>
+                                        <h3 className="font-label-md">Proactive Alert</h3>
+                                    </div>
+                                    <p className="font-body-md text-on-secondary-container">
+                                        Storm front approaching <strong>Maui</strong> in 48 hours. Consider rescheduling your surfing session for tomorrow morning.
+                                    </p>
+                                    <button className="mt-4 text-secondary font-label-md hover:underline">Adjust Plan</button>
+                                </div>
+                            </aside>
+                        </div>
+                    </main>
+                    <Footer />
+                </div>
+            );
+        };
+
+        const EventDetailPage = () => {
+            return (
+                <div className="min-h-screen">
+                    <NavBar />
+                    <main className="pt-16 pb-section-gap">
+                        <section className="relative h-[480px] md:h-[560px] w-full overflow-hidden">
+                            <img alt="Garden Wedding" className="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD1DifDLFT3vLgodoztC37nRTK8Zu_KWYHOizOjfHNSPEZmQKC0yj1AEqzavqjjh4kdO9evLlKn7A9AaB3pY428Yy5nrASnjzk3xHIs5F_CAz7JpRYFqe3kYClJqIyjZRhcddyYyUUYp3-KtvqYpsoforrV5EtEZH983x0whB7sEoY6f3_TG9TQrhKvMhTwaXV4vLY3CFJYmf2KbKzztSIY8bJp6u3Qk4Z_QAvy4tfdl37X143u-rk2hAJsK__1gt7h_IsoYxOWfAQm" />
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
+                            <div className="absolute bottom-12 left-0 w-full px-gutter md:px-container-margin-desktop">
+                                <div className="max-w-7xl mx-auto flex flex-col md:flex-row md:items-end justify-between gap-6">
+                                    <div className="glass p-6 md:p-10 rounded-xl md:rounded-2xl max-w-2xl">
+                                        <div className="flex items-center gap-2 text-primary font-label-md mb-2">
+                                            <span className="material-symbols-outlined text-[18px]">location_on</span>
+                                            Santa Barbara, CA
+                                        </div>
+                                        <h1 className="font-headline-lg md:text-display-lg text-on-surface mb-2">Garden Wedding</h1>
+                                        <p className="font-body-lg text-on-surface-variant">Saturday, June 14 • 2:00 PM - 10:00 PM</p>
+                                        <button className="mt-4 flex items-center gap-2 border border-primary text-primary font-label-md px-6 py-2 rounded-full hover:bg-primary/10 transition-colors active:scale-95 duration-200">
+                                            <span className="material-symbols-outlined text-[18px]">search</span>Check New Event
+                                        </button>
+                                    </div>
+                                    <div className="bg-surface-container-lowest/90 backdrop-blur-md p-6 rounded-2xl shadow-xl flex items-center gap-6 border border-primary/10">
+                                        <div className="relative w-20 h-20">
+                                            <svg className="w-full h-full" viewBox="0 0 36 36">
+                                                <path className="stroke-surface-container-high" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" strokeWidth="3"></path>
+                                                <path className="stroke-primary" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" strokeDasharray="92, 100" strokeLinecap="round" strokeWidth="3"></path>
+                                            </svg>
+                                            <div className="absolute inset-0 flex items-center justify-center">
+                                                <span className="font-headline-md text-primary">92%</span>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <p className="font-label-sm text-on-surface-variant uppercase tracking-wider">Planning Confidence</p>
+                                            <h3 className="font-headline-md text-on-surface">Ideal Conditions</h3>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+
+                        <div className="max-w-7xl mx-auto px-gutter md:px-container-margin-desktop -mt-8 relative z-10">
+                            <div className="grid grid-cols-1 lg:grid-cols-12 gap-gutter md:gap-section-gap">
+                                <div className="lg:col-span-8 space-y-section-gap">
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-gutter">
+                                        <div className="bg-surface-container-lowest p-6 rounded-2xl border border-outline-variant/30 hover:shadow-lg transition-all duration-500">
+                                            <div className="w-12 h-12 bg-primary-fixed rounded-xl flex items-center justify-center mb-4 text-on-primary-fixed-variant">
+                                                <span className="material-symbols-outlined">apparel</span>
+                                            </div>
+                                            <h4 className="font-headline-md mb-2">Attire</h4>
+                                            <p className="font-body-md text-on-surface-variant">Opt for light linen or silk. Expect a 12°F drop after 7:30 PM sunset—bring a shawl or light blazer.</p>
+                                        </div>
+                                        <div className="bg-surface-container-lowest p-6 rounded-2xl border border-outline-variant/30 hover:shadow-lg transition-all duration-500">
+                                            <div className="w-12 h-12 bg-tertiary-fixed rounded-xl flex items-center justify-center mb-4 text-on-tertiary-fixed-variant">
+                                                <span className="material-symbols-outlined">assignment_late</span>
+                                            </div>
+                                            <h4 className="font-headline-md mb-2">Contingency</h4>
+                                            <p className="font-body-md text-on-surface-variant">Low priority. 3% rain probability. Plan B tent not required, but have umbrellas ready for guest comfort.</p>
+                                        </div>
+                                    </div>
+                                    
+                                    <div className="bg-surface-container-low p-8 rounded-3xl">
+                                        <div className="flex items-center justify-between mb-8">
+                                            <h3 className="font-headline-lg text-on-surface">Precision Metrics</h3>
+                                            <span className="bg-primary/10 text-primary px-4 py-1 rounded-full font-label-md">Live Updates</span>
+                                        </div>
+                                        <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+                                            <div className="flex flex-col gap-1">
+                                                <span className="text-on-surface-variant font-label-sm uppercase tracking-widest">Temp</span>
+                                                <div className="flex items-baseline gap-1">
+                                                    <span className="font-display-lg text-on-surface">74°</span>
+                                                </div>
+                                                <span className="text-on-surface-variant font-label-sm">Feels 76°</span>
+                                            </div>
+                                            <div className="flex flex-col gap-1">
+                                                <span className="text-on-surface-variant font-label-sm uppercase tracking-widest">UV Index</span>
+                                                <span className="font-display-lg text-on-surface">8</span>
+                                                <span className="text-secondary font-label-md">Very High</span>
+                                            </div>
+                                            <div className="flex flex-col gap-1">
+                                                <span className="text-on-surface-variant font-label-sm uppercase tracking-widest">Wind</span>
+                                                <span className="font-display-lg text-on-surface">9</span>
+                                                <span className="text-on-surface-variant font-label-sm">mph NW</span>
+                                            </div>
+                                            <div className="flex flex-col gap-1">
+                                                <span className="text-on-surface-variant font-label-sm uppercase tracking-widest">Humidity</span>
+                                                <span className="font-display-lg text-on-surface">58%</span>
+                                                <span className="text-on-surface-variant font-label-sm">Comfortable</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <aside className="lg:col-span-4">
+                                    <div className="bg-primary-container text-on-primary-container p-6 rounded-3xl relative overflow-hidden">
+                                        <div className="relative z-10">
+                                            <h4 className="font-headline-md mb-2">Smart Tip</h4>
+                                            <p className="font-body-md opacity-90">Santa Barbara's "May Gray" or "June Gloom" usually burns off by 1:00 PM. High likelihood of crisp, clear blue skies by your 2:00 PM ceremony.</p>
+                                        </div>
+                                        <div className="absolute -right-4 -bottom-4 opacity-10">
+                                            <span className="material-symbols-outlined text-[120px]">lightbulb</span>
+                                        </div>
+                                    </div>
+                                </aside>
+                            </div>
+                        </div>
+                    </main>
+                    <Footer />
+                </div>
+            );
+        };
+
+        const LoginPage = () => {
+            const navigate = useNavigate();
+            return (
+                <div className="min-h-screen flex flex-col">
+                    <NavBar />
+                    <main className="flex-grow flex items-center justify-center pt-24 pb-12 px-gutter">
+                        <div className="w-full max-w-[440px] relative">
+                            <div className="absolute -top-24 -left-24 w-64 h-64 bg-primary/10 rounded-full blur-[80px] pointer-events-none"></div>
+                            <div className="absolute -bottom-24 -right-24 w-64 h-64 bg-secondary-container/10 rounded-full blur-[80px] pointer-events-none"></div>
+                            <div className="glass-card rounded-xl p-8 md:p-10 relative z-10 bg-surface-container-lowest">
+                                <div className="text-center mb-8">
+                                    <h1 className="font-headline-lg text-on-surface mb-2">Welcome Back</h1>
+                                    <p className="font-body-md text-on-surface-variant">Sign in to sync your weather-smart schedule.</p>
+                                </div>
+                                <form className="space-y-6" onSubmit={(e) => { e.preventDefault(); navigate('/'); }}>
+                                    <div className="space-y-2">
+                                        <label className="font-label-md text-on-surface ml-1" htmlFor="email">Email Address</label>
+                                        <div className="relative">
+                                            <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline">mail</span>
+                                            <input className="w-full pl-12 pr-4 py-3 bg-surface border-0 border-b-2 border-surface-variant focus:border-primary focus:ring-0 transition-all font-body-md text-on-surface rounded-t-lg" id="email" placeholder="name@example.com" required type="email" />
+                                        </div>
+                                    </div>
+                                    <div className="space-y-2">
+                                        <div className="flex justify-between items-center ml-1">
+                                            <label className="font-label-md text-on-surface" htmlFor="password">Password</label>
+                                            <a className="font-label-sm text-primary hover:underline transition-all" href="#">Forgot?</a>
+                                        </div>
+                                        <div className="relative">
+                                            <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline">lock</span>
+                                            <input className="w-full pl-12 pr-4 py-3 bg-surface border-0 border-b-2 border-surface-variant focus:border-primary focus:ring-0 transition-all font-body-md text-on-surface rounded-t-lg" id="password" placeholder="••••••••" required type="password" />
+                                        </div>
+                                    </div>
+                                    <button className="w-full bg-primary text-on-primary font-label-md py-4 rounded-full hover:bg-primary-container shadow-md hover:shadow-xl transition-all duration-300 active:scale-[0.98] mt-4" type="submit">
+                                        Log In
+                                    </button>
+                                </form>
+                                <div className="mt-8 pt-8 border-t border-surface-variant text-center">
+                                    <p className="font-body-md text-on-surface-variant">
+                                        New to Atmosphere? 
+                                        <a className="text-primary font-label-md hover:underline ml-1" href="#">Sign up</a>
+                                    </p>
+                                </div>
+                            </div>
+                            <div className="mt-8 flex justify-center items-center gap-6 opacity-60">
+                                <div className="flex items-center gap-1">
+                                    <span className="material-symbols-outlined text-[18px]">verified_user</span>
+                                    <span className="font-label-sm">Secure</span>
+                                </div>
+                                <div className="flex items-center gap-1">
+                                    <span className="material-symbols-outlined text-[18px]">cloud_done</span>
+                                    <span className="font-label-sm">Live Sync</span>
+                                </div>
+                            </div>
+                        </div>
+                    </main>
+                    <Footer />
+                </div>
+            );
+        };
+
+        const App = () => {
+            return (
+                <MemoryRouter>
+                    <Routes>
+                        <Route path="/" element={<BookmarksPage />} />
+                        <Route path="/bookmarks" element={<BookmarksPage />} />
+                        <Route path="/event" element={<EventDetailPage />} />
+                        <Route path="/login" element={<LoginPage />} />
+                    </Routes>
+                </MemoryRouter>
+            );
+        };
+
+        const root = createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
