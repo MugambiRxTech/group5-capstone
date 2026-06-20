@@ -1,0 +1,126 @@
+.clothing-panel {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(255, 255, 255, 0.95) 100%);
+  border-radius: 20px;
+  padding: 1.5rem;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(10px);
+}
+
+.clothing-title {
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin: 0 0 1.5rem 0;
+  color: #1a1a1a;
+}
+
+.temp-badge {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem;
+  border-radius: 12px;
+  margin-bottom: 1.5rem;
+  font-weight: 600;
+  color: white;
+}
+
+.temp-hot {
+  background: linear-gradient(135deg, #f59e0b 0%, #e67e22 100%);
+}
+
+.temp-warm {
+  background: linear-gradient(135deg, #ec4899 0%, #f59e0b 100%);
+}
+
+.temp-mild {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.temp-cool {
+  background: linear-gradient(135deg, #06b6d4 0%, #0ea5e9 100%);
+}
+
+.temp-cold {
+  background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%);
+}
+
+.temp-badge span {
+  display: block;
+}
+
+.temp-badge span:first-child {
+  font-size: 1.5rem;
+}
+
+.condition-label {
+  font-size: 0.8rem;
+  opacity: 0.9;
+}
+
+.clothing-items {
+  margin-bottom: 1rem;
+}
+
+.items-label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #333;
+  margin: 0 0 1rem 0;
+}
+
+.items-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.clothing-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  background: #f9f9f9;
+  border-radius: 10px;
+  transition: all 0.3s ease;
+}
+
+.clothing-item:hover {
+  background: #f0f0f0;
+  transform: translateX(4px);
+}
+
+.item-emoji {
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+
+.item-name {
+  font-size: 0.9rem;
+  color: #333;
+  font-weight: 500;
+}
+
+.clothing-tip {
+  font-size: 0.85rem;
+  color: #999;
+  background: #f9f9f9;
+  padding: 0.75rem;
+  border-radius: 8px;
+  margin: 0;
+  line-height: 1.5;
+}
+
+@media (max-width: 768px) {
+  .clothing-panel {
+    padding: 1rem;
+  }
+
+  .clothing-title {
+    font-size: 1rem;
+  }
+
+  .items-grid {
+    grid-template-columns: 1fr;
+  }
+}

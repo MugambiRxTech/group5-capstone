@@ -1,0 +1,161 @@
+.hourly-forecast {
+  background: white;
+  border-radius: 16px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  transition: all 0.3s ease;
+}
+
+.hourly-forecast:hover {
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+.forecast-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid #f0f4f8;
+}
+
+.forecast-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #1a202c;
+  margin: 0;
+}
+
+.forecast-range {
+  font-size: 0.8rem;
+  color: #718096;
+  background: #f0f4f8;
+  padding: 0.4rem 0.8rem;
+  border-radius: 20px;
+  font-weight: 600;
+}
+
+.hourly-scroll {
+  display: flex;
+  gap: 0.75rem;
+  overflow-x: auto;
+  padding-bottom: 0.5rem;
+  scroll-behavior: smooth;
+}
+
+.hourly-scroll::-webkit-scrollbar {
+  height: 4px;
+}
+
+.hourly-scroll::-webkit-scrollbar-track {
+  background: #f0f4f8;
+  border-radius: 10px;
+}
+
+.hourly-scroll::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, #0066ff 0%, #0052cc 100%);
+  border-radius: 10px;
+}
+
+.hourly-card {
+  min-width: 100px;
+  padding: 1.2rem 0.75rem;
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.hourly-card:hover {
+  background: linear-gradient(135deg, #0066ff 0%, #0052cc 100%);
+  border-color: #0066ff;
+  color: white;
+  transform: translateY(-6px);
+  box-shadow: 0 8px 20px rgba(0, 102, 255, 0.2);
+}
+
+.hour-time {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #718096;
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.hourly-card:hover .hour-time {
+  color: white;
+}
+
+.hour-icon {
+  font-size: 2rem;
+  margin: 0;
+}
+
+.hour-temp {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #0066ff;
+  margin: 0;
+  line-height: 1;
+}
+
+.hourly-card:hover .hour-temp {
+  color: white;
+}
+
+.hour-condition {
+  font-size: 0.75rem;
+  color: #a0aec0;
+  margin: 0;
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.hourly-card:hover .hour-condition {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.forecast-footer {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid #e2e8f0;
+}
+
+.footer-text {
+  font-size: 0.8rem;
+  color: #718096;
+  margin: 0;
+  text-align: center;
+  font-weight: 600;
+}
+
+@media (max-width: 768px) {
+  .hourly-forecast {
+    padding: 1rem;
+  }
+
+  .forecast-title {
+    font-size: 1rem;
+  }
+
+  .hourly-card {
+    min-width: 80px;
+    padding: 1rem 0.6rem;
+  }
+
+  .hour-icon {
+    font-size: 1.5rem;
+  }
+
+  .hour-temp {
+    font-size: 1.2rem;
+  }
+}
