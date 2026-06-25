@@ -3,36 +3,30 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useGoogleLogin } from '@react-oauth/google';
 import toast from 'react-hot-toast';
 import { useAuth } from '../contexts/AuthContext';
-
 export default function LoginPage() {
   const navigate = useNavigate();
   const { login } = useAuth();
   
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-
   const handleLogin = (e) => {
     e.preventDefault();
-
     // Check for empty fields
     if (!email || !password) {
       toast.error('Please enter both email and password.');
       return;
     }
-
     // Check for valid email format
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
       toast.error('Please enter a valid email address.');
       return;
     }
-
     // If details are correct login the user
     login({ name: "Jane Doe", email: email });
     toast.success('Welcome back!');
     navigate('/bookmarks');
   };
-
   const handleGoogleLogin = useGoogleLogin({
     onSuccess: (tokenResponse) => {
       login({ name: "Google User", email: "google@example.com" });
@@ -41,20 +35,17 @@ export default function LoginPage() {
     },
     onError: () => toast.error('Google Login Failed.'),
   });
-
   return (
     <main className="flex-grow flex flex-col items-center justify-center p-6 relative overflow-hidden bg-slate-50 dark:bg-slate-950 transition-colors duration-300">
       
       <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-blue-100 dark:bg-blue-900/20 rounded-full blur-3xl opacity-50 pointer-events-none"></div>
       <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-orange-50 dark:bg-orange-900/10 rounded-full blur-3xl opacity-50 pointer-events-none"></div>
-
       <div className="bg-white dark:bg-slate-900 w-full max-w-md rounded-2xl shadow-xl border border-slate-100 dark:border-slate-800 p-10 z-10 transition-colors duration-300">
         
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-slate-900 dark:text-slate-100 mb-2">Welcome Back</h1>
           <p className="text-slate-500 dark:text-slate-400 text-sm">Sign in to sync your weather-smart schedule.</p>
         </div>
-
         <div className="space-y-5">
           
           <button onClick={() => handleGoogleLogin()} type="button" className="w-full flex items-center justify-center bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 font-medium py-2.5 px-4 rounded-lg transition duration-200">
@@ -66,13 +57,11 @@ export default function LoginPage() {
             </svg>
             Continue with Google
           </button>
-
           <div className="relative flex items-center py-2">
             <div className="flex-grow border-t border-slate-200 dark:border-slate-700"></div>
             <span className="flex-shrink-0 mx-4 text-slate-400 dark:text-slate-500 text-sm">Or continue with email</span>
             <div className="flex-grow border-t border-slate-200 dark:border-slate-700"></div>
           </div>
-
           <form className="space-y-5" onSubmit={handleLogin}>
             <div className="space-y-1">
               <label className="text-sm font-semibold text-slate-700 dark:text-slate-300">Email Address</label>
@@ -84,7 +73,6 @@ export default function LoginPage() {
                 className="w-full px-4 py-2.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
               />
             </div>
-
             <div className="space-y-1">
               <div className="flex justify-between items-center">
                 <label className="text-sm font-semibold text-slate-700 dark:text-slate-300">Password</label>
@@ -98,13 +86,11 @@ export default function LoginPage() {
                 className="w-full px-4 py-2.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
               />
             </div>
-
             <button type="submit" className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-lg transition duration-200 mt-2">
               Log In
             </button>
           </form>
         </div>
-
         <div className="mt-8 pt-6 border-t border-slate-100 dark:border-slate-800 text-center">
           <p className="text-sm text-slate-600 dark:text-slate-400">
             New to Atmosphere? <Link to="/signup" className="font-medium text-blue-600 dark:text-blue-400 hover:underline">Sign up for free</Link>

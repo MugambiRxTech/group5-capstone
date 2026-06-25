@@ -13,7 +13,6 @@ export const weatherCodes = {
   80: { label: "Rain showers",     icon: "🌦️"  },
   95: { label: "Thunderstorm",     icon: "⛈️"  },
 };
-
 export function getWeather(code) {
   return weatherCodes[code] || { label: "Unknown", icon: "🌡️" };
 }
