@@ -5,6 +5,10 @@ from app.extensions import db
 class RecentView(db.Model):
     __tablename__ = "recent_views"
 
+    __table_args__ = (
+        db.UniqueConstraint('user_id', 'city', 'country', name='uq_user_city_country'),
+    )
+
     id = db.Column(db.Integer, primary_key=True)
 
     user_id = db.Column(

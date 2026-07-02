@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
+import toast from "react-hot-toast";
 import {
     FiEdit2,
     FiPlus,
@@ -11,6 +12,7 @@ import {
 import { useBookmarks } from "../contexts/BookmarksContext";
 import { useWeatherContext } from "../contexts/WeatherContext";
 import { usePlanningNotes } from "../contexts/PlanningNotesContext";
+import LoadingButton from "./LoadingButton";
 
 function ForecastPlanningNotes() {
     const { city } = useWeatherContext();
@@ -36,6 +38,8 @@ function ForecastPlanningNotes() {
     const [selectedNote, setSelectedNote] = useState(null);
 
     const [formError, setFormError] = useState("");
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [isUpdating, setIsUpdating] = useState(false);
 
     const currentBookmark = useMemo(() => {
         if (!city || !bookmarks) return null;
@@ -64,6 +68,8 @@ function ForecastPlanningNotes() {
     const handleCreateNote = async (e) => {
         e.preventDefault();
 
+        if (isSubmitting) return;
+
         if (!currentBookmark) {
             setFormError("Bookmark this location first before adding planning notes.");
             return;
@@ -75,6 +81,7 @@ function ForecastPlanningNotes() {
         }
 
         try {
+            setIsSubmitting(true);
             setFormError("");
 
             await createPlanningNote({
@@ -85,8 +92,11 @@ function ForecastPlanningNotes() {
             });
 
             resetCreateForm();
+            toast.success("Note saved!");
         } catch (error) {
             setFormError(error.message || "Failed to create planning note.");
+        } finally {
+            setIsSubmitting(false);
         }
     };
 
@@ -105,12 +115,15 @@ function ForecastPlanningNotes() {
     };
 
     const handleUpdateNote = async (noteId) => {
+        if (isUpdating) return;
+
         if (!editTitle.trim() || !editContent.trim()) {
             setFormError("Title and content cannot be empty.");
             return;
         }
 
         try {
+            setIsUpdating(true);
             setFormError("");
 
             await updatePlanningNote(noteId, {
@@ -120,14 +133,18 @@ function ForecastPlanningNotes() {
             });
 
             cancelEditing();
+            toast.success("Note updated!");
         } catch (error) {
             setFormError(error.message || "Failed to update planning note.");
+        } finally {
+            setIsUpdating(false);
         }
     };
 
     const handleDeleteNote = async (noteId) => {
         try {
             await deletePlanningNote(noteId);
+            toast.success("Note deleted");
         } catch (error) {
             setFormError(error.message || "Failed to delete planning note.");
         }
@@ -167,7 +184,7 @@ function ForecastPlanningNotes() {
                     <input
                         type="text"
                         value={title}
-                        disabled={!currentBookmark}
+                        disabled={!currentBookmark || isSubmitting}
                         onChange={(e) => setTitle(e.target.value)}
                         placeholder="Note title e.g. Friday travel plan"
                         className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-60"
@@ -176,7 +193,7 @@ function ForecastPlanningNotes() {
                     <input
                         type="date"
                         value={forecastDate}
-                        disabled={!currentBookmark}
+                        disabled={!currentBookmark || isSubmitting}
                         onChange={(e) => setForecastDate(e.target.value)}
                         className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-60"
                     />
@@ -184,21 +201,23 @@ function ForecastPlanningNotes() {
 
                 <textarea
                     value={content}
-                    disabled={!currentBookmark}
+                    disabled={!currentBookmark || isSubmitting}
                     onChange={(e) => setContent(e.target.value)}
                     placeholder="Write your planning note..."
                     rows="3"
                     className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-60"
                 />
 
-                <button
+                <LoadingButton
                     type="submit"
+                    loading={isSubmitting}
+                    loadingText="Saving..."
                     disabled={!currentBookmark}
-                    className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 disabled:opacity-60 disabled:cursor-not-allowed text-white px-5 py-3 rounded-xl transition"
+                    className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-5 py-3 rounded-xl"
                 >
                     <FiPlus />
                     <span>Add Planning Note</span>
-                </button>
+                </LoadingButton>
             </form>
 
             {loadingNotes ? (
@@ -223,38 +242,44 @@ function ForecastPlanningNotes() {
                                     <input
                                         type="text"
                                         value={editTitle}
+                                        disabled={isUpdating}
                                         onChange={(e) => setEditTitle(e.target.value)}
-                                        className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-blue-500"
+                                        className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-60"
                                     />
 
                                     <input
                                         type="date"
                                         value={editForecastDate}
+                                        disabled={isUpdating}
                                         onChange={(e) => setEditForecastDate(e.target.value)}
-                                        className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-blue-500"
+                                        className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-60"
                                     />
 
                                     <textarea
                                         value={editContent}
+                                        disabled={isUpdating}
                                         onChange={(e) => setEditContent(e.target.value)}
                                         rows="3"
-                                        className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-blue-500"
+                                        className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-60"
                                     />
 
                                     <div className="flex gap-3">
-                                        <button
+                                        <LoadingButton
                                             type="button"
                                             onClick={() => handleUpdateNote(note.id)}
-                                            className="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-xl transition"
+                                            loading={isUpdating}
+                                            loadingText="Saving..."
+                                            className="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-xl"
                                         >
                                             <FiSave />
                                             <span>Save</span>
-                                        </button>
+                                        </LoadingButton>
 
                                         <button
                                             type="button"
                                             onClick={cancelEditing}
-                                            className="inline-flex items-center gap-2 bg-slate-200 dark:bg-slate-800 text-slate-800 dark:text-white px-4 py-2 rounded-xl transition"
+                                            disabled={isUpdating}
+                                            className="inline-flex items-center gap-2 bg-slate-200 dark:bg-slate-800 text-slate-800 dark:text-white px-4 py-2 rounded-xl transition disabled:opacity-60 disabled:cursor-not-allowed"
                                         >
                                             <FiX />
                                             <span>Cancel</span>

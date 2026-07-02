@@ -33,6 +33,9 @@ def get_recent_views():
 @recent_views_bp.route("", methods=["POST"])
 @jwt_required()
 def create_recent_view():
+    from datetime import datetime
+    from sqlalchemy.exc import IntegrityError
+
     user_id = get_jwt_identity()
     data = request.get_json()
 
@@ -55,32 +58,43 @@ def create_recent_view():
         country=country
     ).first()
 
-    if existing_recent_view:
-        existing_recent_view.latitude = latitude
-        existing_recent_view.longitude = longitude
+    try:
+        if existing_recent_view:
+            existing_recent_view.latitude = latitude
+            existing_recent_view.longitude = longitude
+            existing_recent_view.viewed_at = datetime.utcnow()
+            db.session.commit()
+            return jsonify({
+                "message": "Recent view updated successfully",
+                "recent_view": existing_recent_view.to_dict()
+            }), 200
 
+        recent_view = RecentView(
+            user_id=user_id,
+            city=city,
+            country=country,
+            latitude=latitude,
+            longitude=longitude,
+        )
+        db.session.add(recent_view)
         db.session.commit()
 
         return jsonify({
+            "message": "Recent view saved successfully",
+            "recent_view": recent_view.to_dict()
+        }), 201
+
+    except IntegrityError:
+        db.session.rollback()
+        existing = RecentView.query.filter_by(
+            user_id=user_id, city=city, country=country
+        ).first()
+        existing.viewed_at = datetime.utcnow()
+        db.session.commit()
+        return jsonify({
             "message": "Recent view updated successfully",
-            "recent_view": existing_recent_view.to_dict()
+            "recent_view": existing.to_dict()
         }), 200
-
-    recent_view = RecentView(
-        user_id=user_id,
-        city=city,
-        country=country,
-        latitude=latitude,
-        longitude=longitude,
-    )
-
-    db.session.add(recent_view)
-    db.session.commit()
-
-    return jsonify({
-        "message": "Recent view saved successfully",
-        "recent_view": recent_view.to_dict()
-    }), 201
 
 
 @recent_views_bp.route("", methods=["DELETE"])

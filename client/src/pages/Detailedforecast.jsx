@@ -29,7 +29,7 @@ function DetailedForecast() {
       latitude: city.latitude,
       longitude: city.longitude,
     });
-  }, [city, weather, addRecentView]);
+  }, [city, weather]);
 
   if (loading) {
     return (

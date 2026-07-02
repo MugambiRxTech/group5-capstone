@@ -1,83 +1,94 @@
 # Smart Weather Advisory System
 
-## Overview
-The Smart Weather Advisory System transforms raw weather data into clear, actionable recommendations that help users make informed decisions about travel, activities, and safety.
+Smart Weather Advisory System is a weather planning app. You search a city, see the forecast, and can save locations you care about. Once a location is bookmarked, you can attach notes to it (like packing reminders or plans tied to a specific date) and the app keeps track of cities you've recently checked.
 
-You can view the demo <a href="https://smartatmosphere.netlify.app/"> here </a>
+This started as a React-only frontend using a public weather API. For Phase 2 we added our own Flask backend and a PostgreSQL database, so accounts and saved data are now real and persistent instead of living only in the browser.
+## Features
 
-## The Problem
-Traditional weather platforms present technical data (temperature, humidity, rainfall, etc.) without translating it into practical insights. Users must interpret conditions themselves, leading to poor planning, discomfort, and exposure to preventable risks.
+- Sign up / log in with a JWT-based session
+- Search for a city and get current weather plus a multi-day forecast (data from Open-Meteo, no API key needed)
+- Bookmark a location, with a snapshot of the weather saved at the time
+- Add, edit, and delete planning notes attached to a bookmarked location
+- Recently viewed cities are tracked automatically
+- Detailed forecast page for a closer look at one location
+## Built With
 
-### Key Challenges
-* **Lack of Contextual Interpretation:** Raw weather data isn't tied to everyday decision-making.
-* **Missing Route-Based Alerts:** No travel safety warnings across specific routes.
-* **No Real-Time Contingency Guidance:** Absence of actionable advice when weather suddenly changes.
+**Frontend:** React (Vite), React Router, Tailwind CSS, Context API for state, react-hot-toast for notifications
 
-## Target Users
-* **Long-distance travelers and commuters**
-* **Urban commuters and event planners**
-* **Tourists and outdoor enthusiasts**
+**Backend:** Flask, SQLAlchemy, Flask-Migrate, Flask-JWT-Extended, Flask-Bcrypt, PostgreSQL
 
-## Core Features
-* **Activity Recommendations:** Suggests whether outdoor or indoor activities are suitable based on the forecast.
-* **Clothing Guidance:** Advises users on exactly what to wear to stay comfortable.
-* **Safety Alerts:** Identifies hazardous conditions (e.g., heavy rain, floods) and suggests necessary precautions.
+**Weather data:** [Open-Meteo](https://open-meteo.com/)
 
-## How It Works (Workflow)
-1. **User Input:** The user inputs their target location and time.
-2. **Data Fetching:** The system retrieves real-time weather data via API.
-3. **Smart Analysis:** The raw data is analyzed and converted into tailored recommendations.
-4. **Actionable Insights:** The dashboard displays clear, practical advice for the user to act upon.
-
-
-## Developers
-1. **David Mugambi:** Group lead and coordinator. Also worked on rendering bookmarks and detailed infornamtion on weather forecasts.
-2. **Akida Mwaruwa:** Handled task coordination, wireframe development and landing page.
-2. **David Musembi:** API handling and edge cases. Built the search bar and search logic.
-3. **Penina Wanyama:** Login & signup page functionality. Also worked on navigation bar and footer.
-4. **Max Kiama:** User interface and user experience developer.
-
-You can find an audio-visual recording <a href="https://drive.google.com/file/d/1geDKCjobopuNb9dNeUdjSprRICKecgy_/view?usp=sharing"> here </a>
-
-
-## Folder Structure
+## Project Structure
 
 ```
-smart-weather-advisory/
-├── public/
-├── src/
-│   ├── assets/
-│   ├── components/
-│   │   ├── Alerts.jsx
-│   │   ├── Bookmarkcard.jsx
-│   │   ├── Footer.jsx
-│   │   ├── Layout.jsx
-│   │   ├── Navbar.jsx
-│   │   ├── Recentlyviewedcard.jsx
-│   │   └── SearchBar.jsx
-│   ├── contexts/
-│   │   ├── AuthContext.jsx
-│   │   └── WeatherContext.jsx
-│   ├── hooks/
-│   │   ├── useGeocoding.js
-│   │   └── useWeather.js
-│   ├── pages/
-│   │   ├── Bookmarks.jsx
-│   │   ├── Detailedforecast.jsx
-│   │   ├── Home.jsx
-│   │   ├── LoginPage.jsx
-│   │   └── SignUpPage.jsx
-│   ├── utils/
-│   │   └── weatherCodes.js
-│   ├── App.css
-│   ├── App.jsx
-│   ├── index.css
-│   ├── Layout.jsx
-│   └── main.jsx
-├── eslint.config.js
-├── index.html
-├── package-lock.json
-├── package.json
-├── README.md
-└── vite.config.js
+client/     React frontend
+  src/
+    contexts/    Auth, Weather, Bookmarks, PlanningNotes, RecentViews
+    pages/       Home, Login, SignUp, Bookmarks, DetailedForecast
+    components/  BookmarkCard, AlertCard, RecentlyViewedCard, etc.
+
+server/     Flask backend
+  app/
+    models/      User, Bookmark, PlanningNote, RecentView
+    routes/      auth, bookmarks, planning_notes, recent_views, weather
+  migrations/
+  run.py
 ```
+## Getting Started
+
+You'll need Node.js, Python 3.8+, and PostgreSQL installed.
+
+### 1. Clone the repo
+```bash
+git clone https://github.com/MugambiRxTech/group5-capstone.git
+cd group5-capstone
+```
+
+### 2. Set up the database
+```bash
+sudo service postgresql start
+sudo -u postgres psql
+```
+Then inside psql:
+```sql
+CREATE USER atmosphere_user WITH PASSWORD 'strongpassword123';
+CREATE DATABASE atmosphere_db OWNER atmosphere_user;
+GRANT ALL PRIVILEGES ON DATABASE atmosphere_db TO atmosphere_user;
+\q
+```
+
+### 3. Backend
+```bash
+cd server
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+flask db upgrade
+python run.py
+```
+Runs on `http://127.0.0.1:5000`
+
+### 4. Frontend
+Open a new terminal:
+```bash
+cd client
+npm install
+npm run dev
+```
+Runs on `http://localhost:5173`
+
+## Environment Variables
+
+Create a `.env` file inside `server/`:
+SECRET_KEY=your-secret-key
+JWT_SECRET_KEY=your-jwt-secret-key
+DATABASE_URL=postgresql+psycopg2://atmosphere_user:strongpassword123@localhost:5432/atmosphere_db
+
+Create a `.env` file inside `client/`:
+VITE_API_BASE_URL=http://127.0.0.1:5000
+VITE_GOOGLE_CLIENT_ID=your-google-client-id
+
+## Deployment
+
+Not deployed yet — runs locally following the setup instructions above.
