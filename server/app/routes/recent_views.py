@@ -1,5 +1,6 @@
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity
+from sqlalchemy import and_, func
 
 from app.extensions import db
 from app.models.recent_view import RecentView
@@ -21,12 +22,27 @@ def get_recent_views():
         RecentView.query
         .filter_by(user_id=user_id)
         .order_by(RecentView.viewed_at.desc())
-        .limit(10)
         .all()
     )
 
+    unique_views = []
+    seen_keys = set()
+
+    for view in recent_views:
+        city_key = view.city.strip().lower()
+        country_key = view.country.strip().lower() if view.country else ""
+        key = (city_key, country_key)
+
+        if key in seen_keys:
+            continue
+        seen_keys.add(key)
+        unique_views.append(view)
+
+        if len(unique_views) >= 10:
+            break
+
     return jsonify({
-        "recent_views": [item.to_dict() for item in recent_views]
+        "recent_views": [item.to_dict() for item in unique_views]
     }), 200
 
 
@@ -52,10 +68,13 @@ def create_recent_view():
             "error": "city, latitude and longitude are required"
         }), 400
 
-    existing_recent_view = RecentView.query.filter_by(
-        user_id=user_id,
-        city=city,
-        country=country
+    normalized_city = city.strip()
+    normalized_country = country.strip() if isinstance(country, str) else ""
+
+    existing_recent_view = RecentView.query.filter(
+        RecentView.user_id == user_id,
+        func.lower(func.trim(RecentView.city)) == normalized_city.lower(),
+        func.lower(func.trim(RecentView.country)) == normalized_country.lower(),
     ).first()
 
     try:
@@ -71,8 +90,8 @@ def create_recent_view():
 
         recent_view = RecentView(
             user_id=user_id,
-            city=city,
-            country=country,
+            city=normalized_city,
+            country=normalized_country,
             latitude=latitude,
             longitude=longitude,
         )

@@ -31,7 +31,7 @@ function BookmarksPage() {
         fetchBookmarks,
     } = useBookmarks();
 
-    const { recentViews = [], fetchRecentViews } = useRecentViews();
+    const { recentViews = [], fetchRecentViews, clearRecentViews } = useRecentViews();
 
     // Pagination State
     const [currentPage, setCurrentPage] = useState(1);
@@ -188,15 +188,24 @@ function BookmarksPage() {
                                     No recently viewed locations yet.
                                 </p>
                             ) : (
-                                <div className="space-y-3">
-                                    {recentViews.slice(0, 5).map((item, index) => (
-                                        <RecentViewItem 
-                                            key={item.id || index} 
-                                            item={item} 
-                                            onView={handleViewLocation} 
-                                        />
-                                    ))}
-                                </div>
+                                <>
+                                    <div className="space-y-3">
+                                        {recentViews.slice(0, 5).map((item, index) => (
+                                            <RecentViewItem 
+                                                key={item.id || index} 
+                                                item={item} 
+                                                onView={handleViewLocation} 
+                                            />
+                                        ))}
+                                    </div>
+
+                                    <button
+                                        onClick={clearRecentViews}
+                                        className="mt-5 w-full inline-flex items-center justify-center gap-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-700 dark:text-slate-200 px-4 py-2 text-sm font-medium hover:bg-slate-100 dark:hover:bg-slate-900 transition"
+                                    >
+                                        Clear Recent Views
+                                    </button>
+                                </>
                             )}
                         </div>
 
